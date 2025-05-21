@@ -1,4 +1,5 @@
 from sqlalchemy import create_engine, text
+from sqlalchemy.exc import OperationalError, ProgrammingError, IntegrityError, SQLAlchemyError
 
 QUERY_FLIGHT_BY_ID = text("SELECT flights.*, airlines.airline, flights.ID as FLIGHT_ID, "
                           "flights.DEPARTURE_DELAY as DELAY FROM flights JOIN airlines "
@@ -46,9 +47,13 @@ class FlightData:
         try:
             with self._engine.connect() as connection:
                 return connection.execute(query, params).mappings().all()
+        except (OperationalError, ProgrammingError, IntegrityError) as error:
+            print(f'Database-specific error: {error}')
+        except SQLAlchemyError as error:
+            print(f'SQLAlchemy error: {error}')
         except Exception as error:
-            print(f'Error executing query: {error}')
-            return []
+            print(f'Unexpected error: {error}')
+        return []
 
     def get_flight_by_id(self, flight_id):
         """
