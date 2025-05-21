@@ -16,6 +16,12 @@ QUERY_FLIGHT_BY_AIRPORT = text("SELECT f.ID AS ID, f.ORIGIN_AIRPORT AS ORIGIN_AI
                                "a.AIRLINE AS AIRLINE, f.DEPARTURE_DELAY AS DELAY "
                                "FROM flights AS f JOIN airlines AS a ON f.AIRLINE = a.ID "
                                "WHERE f.ORIGIN_AIRPORT = :airport AND f.DEPARTURE_DELAY >= 20")
+QUERY_DELAY_PERCENTAGE_BY_AIRLINE = text("SELECT a.AIRLINE AS airline_name, "
+                                         "ROUND(COUNT(CASE WHEN f.DEPARTURE_DELAY > 0 THEN 1 END) "
+                                         "* 100.0 / COUNT(*), 2) AS delay_percentage "
+                                         "FROM flights f JOIN airlines a ON f.AIRLINE = a.ID "
+                                         "GROUP BY a.AIRLINE ORDER BY delay_percentage DESC;")
+
 
 class FlightData:
     """
@@ -48,7 +54,6 @@ class FlightData:
         params = {'id': flight_id}
         return self._execute_query(QUERY_FLIGHT_BY_ID, params)
 
-
     def get_flights_by_date(self, flight_day, flight_month, flight_year):
         """
         """
@@ -67,9 +72,13 @@ class FlightData:
         params = {'airport': airport_input}
         return self._execute_query(QUERY_FLIGHT_BY_AIRPORT, params)
 
+    def get_delay_percentage_by_airline(self):
+        """
+        """
+        return self._execute_query(QUERY_DELAY_PERCENTAGE_BY_AIRLINE, {})
 
     def __del__(self):
         """
-        Closes the connection to the databse when the object is about to be destroyed
+        Closes the connection to the database when the object is about to be destroyed
         """
         self._engine.dispose()

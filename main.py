@@ -1,9 +1,42 @@
 import data
 from datetime import datetime
 import sqlalchemy
+import matplotlib.pyplot as plt
 
 SQLITE_URI = 'sqlite:///data/flights.sqlite3'
 IATA_LENGTH = 3
+
+
+def create_rating_histogram(data_manager):
+    """
+    Retrieves movies data from the movie database.
+    Creates a histogram of the movie ratings and
+    saves it as a .png, user input for file name.
+    """
+    results = data_manager.get_delay_percentage_by_airline()
+    try:
+        airlines = [entry['airline_name'] for entry in results]
+        delay_percentages = [entry['delay_percentage'] for entry in results]
+    except(KeyError, TypeError, ValueError) as error:
+        print(f'Error parsing delayed flight data: {error}.')
+        return
+
+    filename = input("Enter the file name to save the histogram: ")
+
+    plt.figure(figsize=(16, 6))
+    plt.bar(airlines, delay_percentages, color='steelblue')
+
+    plt.title("Percentage of Delayed Flights by Airline")
+    plt.xlabel("Airline")
+    plt.ylabel("Percentage of Delayed Flights")
+
+    plt.xticks(rotation=30, ha='right')
+    plt.tight_layout()
+
+    plt.savefig(filename)
+    print(f"Histogramm saved as {filename}.png")
+
+    plt.show()
 
 
 def delayed_flights_by_airline(data_manager):
@@ -82,7 +115,8 @@ def print_results(results):
 
         # Check that all required columns are in place
         try:
-            delay = int(result['DELAY']) if result['DELAY'] else 0  # If delay columns is NULL, set it to 0
+            delay = int(result['DELAY']) if result[
+                'DELAY'] else 0  # If delay columns is NULL, set it to 0
             origin = result['ORIGIN_AIRPORT']
             dest = result['DESTINATION_AIRPORT']
             airline = result['AIRLINE']
@@ -117,14 +151,16 @@ def show_menu_and_get_input():
             pass
         print("Try again...")
 
+
 """
 Function Dispatch Dictionary
 """
-FUNCTIONS = { 1: (flight_by_id, "Show flight by ID"),
-              2: (flights_by_date, "Show flights by date"),
-              3: (delayed_flights_by_airline, "Delayed flights by airline"),
-              4: (delayed_flights_by_airport, "Delayed flights by origin airport"),
-              5: (quit, "Exit")
+FUNCTIONS = {1: (flight_by_id, "Show flight by ID"),
+             2: (flights_by_date, "Show flights by date"),
+             3: (delayed_flights_by_airline, "Delayed flights by airline"),
+             4: (delayed_flights_by_airport, "Delayed flights by origin airport"),
+             5: (create_rating_histogram, "Visualize airline delay percentages"),
+             6: (quit, "Exit")
              }
 
 
