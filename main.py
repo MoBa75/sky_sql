@@ -2,8 +2,10 @@ import data
 from datetime import datetime
 import sqlalchemy
 import matplotlib.pyplot as plt
+import os
 
-SQLITE_URI = 'sqlite:///data/flights.sqlite3'
+SQLITE_URI = f"""sqlite:///{os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                                         '..', 'data', 'flights.sqlite3'))}"""
 IATA_LENGTH = 3
 
 
