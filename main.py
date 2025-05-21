@@ -9,9 +9,8 @@ IATA_LENGTH = 3
 
 def create_rating_histogram(data_manager):
     """
-    Retrieves movies data from the movie database.
-    Creates a histogram of the movie ratings and
-    saves it as a .png, user input for file name.
+    Creates a visual representation of the percentage of delayed
+    flights per airline and saves the representation as a .png file.
     """
     results = data_manager.get_delay_percentage_by_airline()
     try:

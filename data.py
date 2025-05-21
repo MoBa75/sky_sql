@@ -43,8 +43,12 @@ class FlightData:
         and returns a list of records (dictionary-like objects).
         If an exception was raised, print the error, and return an empty list.
         """
-        with self._engine.connect() as connection:
-            return connection.execute(query, params).mappings().all()
+        try:
+            with self._engine.connect() as connection:
+                return connection.execute(query, params).mappings().all()
+        except Exception as error:
+            print(f'Error executing query: {error}')
+            return []
 
     def get_flight_by_id(self, flight_id):
         """
@@ -56,24 +60,31 @@ class FlightData:
 
     def get_flights_by_date(self, flight_day, flight_month, flight_year):
         """
+        Search all flight details by date and returns a list of all founded flights.
         """
         params = {'year': flight_year, 'month': flight_month, 'day': flight_day}
         return self._execute_query(QUERY_FLIGHT_BY_DATE, params)
 
     def get_delayed_flights_by_airline(self, airline_input):
         """
+        Search all delayed flights and their details by airline
+        and returns a list of all founded flights.
         """
         params = {'airline': airline_input}
         return self._execute_query(QUERY_FLIGHT_BY_AIRLINE, params)
 
     def get_delayed_flights_by_airport(self, airport_input):
         """
+        Search all delayed flights and their details by origin airport
+        and returns a list of all founded flights.
         """
         params = {'airport': airport_input}
         return self._execute_query(QUERY_FLIGHT_BY_AIRPORT, params)
 
     def get_delay_percentage_by_airline(self):
         """
+        Gets percentage of all delayed flights by airlines and
+        returns a list of all founded Airlines.
         """
         return self._execute_query(QUERY_DELAY_PERCENTAGE_BY_AIRLINE, {})
 
