@@ -79,8 +79,6 @@ def print_results(results):
     """
     print(f"Got {len(results)} results.")
     for result in results:
-        # turn result into dictionary
-        result = result._mapping
 
         # Check that all required columns are in place
         try:

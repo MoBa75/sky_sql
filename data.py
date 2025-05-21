@@ -1,7 +1,8 @@
 from sqlalchemy import create_engine, text
 
-QUERY_FLIGHT_BY_ID = "SELECT flights.*, airlines.airline, flights.ID as FLIGHT_ID, flights.DEPARTURE_DELAY as DELAY FROM flights JOIN airlines ON flights.airline = airlines.id WHERE flights.ID = :id"
-
+QUERY_FLIGHT_BY_ID = text("SELECT flights.*, airlines.airline, flights.ID as FLIGHT_ID, "
+                          "flights.DEPARTURE_DELAY as DELAY FROM flights JOIN airlines "
+                          "ON flights.airline = airlines.id WHERE flights.ID = :id")
 
 class FlightData:
     """
@@ -23,7 +24,8 @@ class FlightData:
         and returns a list of records (dictionary-like objects).
         If an exception was raised, print the error, and return an empty list.
         """
-        pass  # Your code here
+        with self._engine.connect() as connection:
+            return connection.execute(query, params).mappings().all()
 
     def get_flight_by_id(self, flight_id):
         """
